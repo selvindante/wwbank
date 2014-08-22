@@ -1,15 +1,15 @@
 package bank.storage;
 
 import bank.BankException;
+import bank.model.Account;
 import bank.model.Client;
+import bank.model.transactions.Transaction;
 import sql.Sql;
 import sql.SqlExecutor;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Selvin
@@ -18,7 +18,7 @@ import java.util.List;
 public class SqlStorage implements IStorage {
     @Override
     public void save(final Client c) {
-        Sql.execute("INSERT INTO \"Clients\" (id, name, age) VALUES(?,?,?)",
+        Sql.execute("INSERT INTO clients (id, name, age) VALUES(?,?,?)",
                 new SqlExecutor<Void>() {
                     @Override
                     public Void execute(PreparedStatement st) throws SQLException {
@@ -30,11 +30,48 @@ public class SqlStorage implements IStorage {
                     }
                 }
         );
+        Map<String, Transaction> transactions = new HashMap<>();
+        for(final Account acc: c.getAccounts().values()) if(acc != null) {
+            Sql.execute("INSERT INTO accounts (account_id, client_id, amount) VALUES(?,?,?)",
+                    new SqlExecutor<Void>() {
+                        @Override
+                        public Void execute(PreparedStatement st) throws SQLException {
+                            st.setString(1, acc.getAccountId());
+                            st.setString(2, acc.getClientId());
+                            st.setInt(3, acc.getAmount());
+                            st.execute();
+                            return null;
+                        }
+                    }
+            );
+            for(Transaction tr: acc.getTransactions().values()) {
+                transactions.put(tr.getTransactionId(), tr);
+            }
+        }
+        for(final Transaction tr: transactions.values()) if (tr != null) {
+            Sql.execute("INSERT INTO transactions VALUES(?,?,?,?,?,?,?,?)",
+                    new SqlExecutor<Void>() {
+                        @Override
+                        public Void execute(PreparedStatement st) throws SQLException {
+                            st.setString(1, tr.getTransactionId());
+                            st.setString(2, tr.getType());
+                            st.setString(3, tr.getDate());
+                            st.setInt(4, tr.getAmount());
+                            st.setString(5, tr.getSenderClientId());
+                            st.setString(6, tr.getSenderAccountId());
+                            st.setString(7, tr.getReceiverClientId());
+                            st.setString(8, tr.getReceiverAccountId());
+                            st.execute();
+                            return null;
+                        }
+                    }
+            );
+        }
     }
 
     @Override
     public void update(final Client c) {
-        int cnt = Sql.execute("UPDATE \"Clients\" SET name=?, age=? WHERE id=?",
+        int cnt = Sql.execute("UPDATE clients SET name=?, age=? WHERE id=?",
                 new SqlExecutor<Integer>() {
                     @Override
                     public Integer execute(PreparedStatement st) throws SQLException {
@@ -51,7 +88,7 @@ public class SqlStorage implements IStorage {
 
     @Override
     public Client load(final String id) {
-        return Sql.execute("SELECT c.id, c.name, c.age FROM \"Clients\" AS c WHERE c.id=?",
+        return Sql.execute("SELECT c.id, c.name, c.age FROM clients AS c WHERE c.id=?",
                 new SqlExecutor<Client>() {
                     @Override
                     public Client execute(PreparedStatement st) throws SQLException {
@@ -68,7 +105,7 @@ public class SqlStorage implements IStorage {
     @Override
     public void delete(final String id) {
         // Strategy
-        int cnt = Sql.execute("DELETE FROM \"Clients\" WHERE id=?", new SqlExecutor<Integer>() {
+        int cnt = Sql.execute("DELETE FROM clients WHERE id=?", new SqlExecutor<Integer>() {
             @Override
             public Integer execute(PreparedStatement ps) throws SQLException {
                 ps.setString(1, id);
@@ -82,7 +119,7 @@ public class SqlStorage implements IStorage {
 
     @Override
     public Collection<Client> getAll() {
-        return Sql.execute("SELECT c.id, c.name, c.age  FROM \"Clients\" AS c order by c.name, c.id",
+        return Sql.execute("SELECT c.id, c.name, c.age  FROM clients AS c order by c.name, c.id",
                 new SqlExecutor<Collection<Client>>() {
                     @Override
                     public Collection<Client> execute(PreparedStatement st) throws SQLException {
@@ -99,7 +136,21 @@ public class SqlStorage implements IStorage {
 
     @Override
     public void clear() {
-        Sql.execute("DELETE FROM \"Clients\"", new SqlExecutor<Void>() {
+        Sql.execute("DELETE FROM transactions", new SqlExecutor<Void>() {
+            @Override
+            public Void execute(PreparedStatement ps) throws SQLException {
+                ps.execute();
+                return null;
+            }
+        });
+        Sql.execute("DELETE FROM accounts", new SqlExecutor<Void>() {
+            @Override
+            public Void execute(PreparedStatement ps) throws SQLException {
+                ps.execute();
+                return null;
+            }
+        });
+        Sql.execute("DELETE FROM clients", new SqlExecutor<Void>() {
             @Override
             public Void execute(PreparedStatement ps) throws SQLException {
                 ps.execute();

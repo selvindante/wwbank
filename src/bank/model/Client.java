@@ -45,4 +45,8 @@ public class Client {
     public void addAccount(Account account) {
         this.accounts.put(account.getAccountId(), account);
     }
+
+    public Map<String, Account> getAccounts() {
+        return accounts;
+    }
 }

@@ -47,4 +47,8 @@ public class Account {
     public void addTransaction(Transaction tr) {
         transactions.put(tr.getTransactionId(), tr);
     }
+
+    public Map<String, Transaction> getTransactions() {
+        return transactions;
+    }
 }

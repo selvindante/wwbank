@@ -3,7 +3,7 @@ package main;
 import bank.model.Account;
 import bank.model.Client;
 import bank.model.transactions.Transaction;
-import bank.model.transactions.Transfer;
+import bank.model.transactions.TransactionType;
 import bank.storage.IStorage;
 import bank.storage.SqlStorage;
 
@@ -26,8 +26,11 @@ public class Main {
         Account ac4 = new Account(cl4, 325);
         Account ac5 = new Account(cl5, 570);
 
-        Transaction tr1 = new Transfer(ac1, ac2, 350);
+        Transaction tr1 = new Transaction(TransactionType.DEPOSIT, ac3, 70);
+        Transaction tr2 = new Transaction(TransactionType.WITHDRAWAL, ac4, 25);
+        Transaction tr3 = new Transaction(TransactionType.TRANSFER, ac3, ac4, 100);
 
         IStorage st = new SqlStorage();
+        st.clear();
     }
 }
