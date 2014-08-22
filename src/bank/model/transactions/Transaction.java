@@ -1,4 +1,4 @@
-package model.transactions;
+package bank.model.transactions;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

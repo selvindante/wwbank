@@ -1,6 +1,6 @@
-package model;
+package bank.model;
 
-import model.transactions.Transaction;
+import bank.model.transactions.Transaction;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,14 +16,15 @@ public class Account {
     private int amount;
     Map<String, Transaction> transactions = new HashMap<>();
 
-    public Account(String clientId) {
+    public Account(Client client) {
         this.accountId = UUID.randomUUID().toString();
-        this.clientId = clientId;
+        this.clientId = client.getClientId();
         this.amount = 0;
+        client.addAccount(this);
     }
 
-    public Account(String clientId, int amount) {
-        this(clientId);
+    public Account(Client client, int amount) {
+        this(client);
         this.amount = amount;
     }
 

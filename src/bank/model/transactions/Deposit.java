@@ -1,6 +1,6 @@
-package model.transactions;
+package bank.model.transactions;
 
-import model.Account;
+import bank.model.Account;
 
 /**
  * Created by Selvin
@@ -18,5 +18,6 @@ public class Deposit extends Transaction {
         this.amount = amount;
         //Transaction
         account.setAmount(account.getAmount() + amount);
+        account.addTransaction(this);
     }
 }

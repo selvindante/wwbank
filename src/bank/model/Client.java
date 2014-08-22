@@ -1,4 +1,4 @@
-package model;
+package bank.model;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,8 +24,22 @@ public class Client {
         this.age = age;
     }
 
+    public Client(String clientId, String name, int age) {
+        this.age = age;
+        this.clientId = clientId;
+        this.name = name;
+    }
+
     public String getClientId() {
         return clientId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
     }
 
     public void addAccount(Account account) {

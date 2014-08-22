@@ -1,9 +1,11 @@
 package main;
 
-import model.Account;
-import model.Client;
-import model.transactions.Transaction;
-import model.transactions.Transfer;
+import bank.model.Account;
+import bank.model.Client;
+import bank.model.transactions.Transaction;
+import bank.model.transactions.Transfer;
+import bank.storage.IStorage;
+import bank.storage.SqlStorage;
 
 /**
  * Created by Selvin
@@ -14,16 +16,18 @@ public class Main {
 
         Client cl1 = new Client("Bob", 34);
         Client cl2 = new Client("Jack", 29);
+        Client cl3 = new Client("Joe", 41);
+        Client cl4 = new Client("Arvin", 37);
+        Client cl5 = new Client("Johny", 25);
 
-        Account ac1 = new Account(cl1.getClientId(), 1000);
-        Account ac2 = new Account(cl2.getClientId(), 360);
-
-        cl1.addAccount(ac1);
-        cl2.addAccount(ac2);
+        Account ac1 = new Account(cl1, 1000);
+        Account ac2 = new Account(cl2, 360);
+        Account ac3 = new Account(cl4, 230);
+        Account ac4 = new Account(cl4, 325);
+        Account ac5 = new Account(cl5, 570);
 
         Transaction tr1 = new Transfer(ac1, ac2, 350);
 
-        ac1.addTransaction(tr1);
-        ac2.addTransaction(tr1);
+        IStorage st = new SqlStorage();
     }
 }

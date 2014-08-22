@@ -1,6 +1,6 @@
-package model.transactions;
+package bank.model.transactions;
 
-import model.Account;
+import bank.model.Account;
 
 /**
  * Created by Selvin
@@ -23,5 +23,7 @@ public class Transfer extends Transaction{
         //Transaction
         sender.setAmount(sender.getAmount() - amount);
         receiver.setAmount(receiver.getAmount() + amount);
+        sender.addTransaction(this);
+        receiver.addTransaction(this);
     }
 }
