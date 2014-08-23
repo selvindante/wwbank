@@ -30,7 +30,7 @@ public class SqlStorage implements IStorage {
                     }
                 }
         );
-        Map<String, Transaction> transactions = new HashMap<>();
+        Collection<Transaction> transactions = new HashSet<>();
         for(final Account acc: c.getAccounts().values()) if(acc != null) {
             Sql.execute("INSERT INTO accounts (account_id, client_id, amount) VALUES(?,?,?)",
                     new SqlExecutor<Void>() {
@@ -45,10 +45,10 @@ public class SqlStorage implements IStorage {
                     }
             );
             for(Transaction tr: acc.getTransactions().values()) {
-                transactions.put(tr.getTransactionId(), tr);
+                transactions.add(tr);
             }
         }
-        for(final Transaction tr: transactions.values()) if (tr != null) {
+        for(final Transaction tr: transactions) if (tr != null) {
             Sql.execute("INSERT INTO transactions VALUES(?,?,?,?,?,?,?,?)",
                     new SqlExecutor<Void>() {
                         @Override
@@ -88,18 +88,55 @@ public class SqlStorage implements IStorage {
 
     @Override
     public Client load(final String id) {
-        return Sql.execute("SELECT c.id, c.name, c.age FROM clients AS c WHERE c.id=?",
-                new SqlExecutor<Client>() {
+        Client cl = Sql.execute("SELECT c.id, c.name, c.age FROM clients AS c WHERE c.id=?",
+            new SqlExecutor<Client>() {
+                @Override
+                public Client execute(PreparedStatement st) throws SQLException {
+                    st.setString(1, id);
+                    ResultSet rs = st.executeQuery();
+                    if (rs.next()) {
+                        return new Client(rs.getString("name"), id,  rs.getInt("age"), null);
+                    }
+                    throw new BankException("Client " + id + " is not found.");
+                }
+            });
+        Map<String, Account> accounts = Sql.execute("SELECT a.account_id, a.client_id, a.amount FROM accounts AS a WHERE a.client_id=?",
+                new SqlExecutor<Map<String, Account>>() {
                     @Override
-                    public Client execute(PreparedStatement st) throws SQLException {
+                    public Map<String, Account> execute(PreparedStatement st) throws SQLException {
                         st.setString(1, id);
                         ResultSet rs = st.executeQuery();
-                        if (rs.next()) {
-                            return new Client(id, rs.getString("name"), rs.getInt("age"));
+                        Map<String, Account> res = new HashMap<>();
+                        while (rs.next()) {
+                            Account acc = new Account(rs.getString("account_id"), id, rs.getInt("amount"));
+                            res.put(acc.getAccountId(), acc);
                         }
-                        throw new BankException("Client " + id + " is not found.");
+                        return res;
                     }
                 });
+        cl.setAccounts(accounts);
+        for(Account acc: cl.getAccounts().values()) {
+            final String accId = acc.getAccountId();
+            Map<String, Transaction> transactions = Sql.execute("SELECT t.transaction_id, t.type, t.date, t.amount, t.sender_client_id, t.sender_account_id, t.receiver_client_id, t.receiver_account_id FROM transactions AS t WHERE t.sender_account_id=? OR t.receiver_account_id=?",
+                    new SqlExecutor<Map<String, Transaction>>() {
+                        @Override
+                        public Map<String, Transaction> execute(PreparedStatement st) throws SQLException {
+                            st.setString(1, accId);
+                            st.setString(2, accId);
+                            ResultSet rs = st.executeQuery();
+                            Map<String, Transaction> res = new HashMap<>();
+                            while (rs.next()) {
+                                Transaction tr = new Transaction(rs.getString("transaction_id"), rs.getString("type"), rs.getString("date"), rs.getInt("amount"),
+                                                                 rs.getString("sender_client_id"), rs.getString("sender_account_id"),
+                                                                 rs.getString("receiver_client_id"), rs.getString("receiver_account_id"));
+                                res.put(tr.getTransactionId(), tr);
+                            }
+                            return res;
+                        }
+                    });
+            acc.setTransactions(transactions);
+        }
+        return cl;
     }
 
     @Override
@@ -127,7 +164,7 @@ public class SqlStorage implements IStorage {
                         ResultSet rs = st.executeQuery();
                         while (rs.next()) {
                             String id = rs.getString("id");
-                            res.add(new Client(id, rs.getString("name"), rs.getInt("age")));
+                            res.add(new Client(rs.getString("name"), id, rs.getInt("age"), null));
                         }
                         return res;
                     }

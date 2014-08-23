@@ -14,20 +14,17 @@ public class Client {
     private int age;
     private Map<String, Account> accounts =  new HashMap<>();
 
-    public Client() {
-        this.clientId = UUID.randomUUID().toString();
-    }
-
     public Client(String name, int age) {
         this.clientId = UUID.randomUUID().toString();
         this.name = name;
         this.age = age;
     }
 
-    public Client(String clientId, String name, int age) {
-        this.age = age;
-        this.clientId = clientId;
+    public Client(String name, String clientId, int age, Map<String, Account> accounts) {
         this.name = name;
+        this.clientId = clientId;
+        this.age = age;
+        this.accounts = accounts;
     }
 
     public String getClientId() {
@@ -44,6 +41,10 @@ public class Client {
 
     public void addAccount(Account account) {
         this.accounts.put(account.getAccountId(), account);
+    }
+
+    public void setAccounts(Map<String, Account> accounts) {
+        this.accounts = accounts;
     }
 
     public Map<String, Account> getAccounts() {

@@ -69,6 +69,17 @@ public class Transaction {
         }
     }
 
+    public Transaction(String transactionId, String type, String date, int amount, String senderClientId, String senderAccountId, String receiverClientId, String receiverAccountId) {
+        this.transactionId = transactionId;
+        this.type = type;
+        this.date = date;
+        this.senderClientId = senderClientId;
+        this.senderAccountId = senderAccountId;
+        this.receiverClientId = receiverClientId;
+        this.receiverAccountId = receiverAccountId;
+        this.amount = amount;
+    }
+
     public String getTransactionId() {
         return transactionId;
     }

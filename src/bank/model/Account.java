@@ -28,6 +28,12 @@ public class Account {
         this.amount = amount;
     }
 
+    public Account(String accountId, String clientId, int amount) {
+        this.clientId = clientId;
+        this.accountId = accountId;
+        this.amount = amount;
+    }
+
     public String getAccountId() {
         return accountId;
     }
@@ -46,6 +52,10 @@ public class Account {
 
     public void addTransaction(Transaction tr) {
         transactions.put(tr.getTransactionId(), tr);
+    }
+
+    public void setTransactions(Map<String, Transaction> transactions) {
+        this.transactions = transactions;
     }
 
     public Map<String, Transaction> getTransactions() {

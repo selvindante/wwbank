@@ -1,9 +1,6 @@
 package main;
 
-import bank.model.Account;
 import bank.model.Client;
-import bank.model.transactions.Transaction;
-import bank.model.transactions.TransactionType;
 import bank.storage.IStorage;
 import bank.storage.SqlStorage;
 
@@ -14,7 +11,7 @@ import bank.storage.SqlStorage;
 public class Main {
     public static void main(String[] args) {
 
-        Client cl1 = new Client("Bob", 34);
+        /*Client cl1 = new Client("Bob", 34);
         Client cl2 = new Client("Jack", 29);
         Client cl3 = new Client("Joe", 41);
         Client cl4 = new Client("Arvin", 37);
@@ -28,9 +25,9 @@ public class Main {
 
         Transaction tr1 = new Transaction(TransactionType.DEPOSIT, ac3, 70);
         Transaction tr2 = new Transaction(TransactionType.WITHDRAWAL, ac4, 25);
-        Transaction tr3 = new Transaction(TransactionType.TRANSFER, ac3, ac4, 100);
+        Transaction tr3 = new Transaction(TransactionType.TRANSFER, ac3, ac4, 100);*/
 
         IStorage st = new SqlStorage();
-        st.clear();
+        Client test = st.load("e958b678-109e-4ec5-ae88-46b9b7005b63");
     }
 }
