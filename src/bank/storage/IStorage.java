@@ -1,6 +1,8 @@
 package bank.storage;
 
+import bank.model.Account;
 import bank.model.Client;
+import bank.model.transactions.Transaction;
 
 import java.util.Collection;
 
@@ -10,15 +12,19 @@ import java.util.Collection;
  */
 public interface IStorage {
 
-    void save(Client c);
+    void saveClient(Client c);
 
-    void update(Client c);
+    void addAccount(Account acc);
 
-    Client load(String id);
+    void addTransaction(Transaction tr);
 
-    void delete(String id);
+    void updateClient(Client c);
+
+    Client loadClient(String id);
+
+    void deleteClient(String id);
 
     Collection<Client> getAll();
 
-    void clear();
+    void clearDataBase();
 }

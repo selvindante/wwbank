@@ -17,7 +17,7 @@ import java.util.*;
  */
 public class SqlStorage implements IStorage {
     @Override
-    public void save(final Client c) {
+    public void saveClient(final Client c) {
         Sql.execute("INSERT INTO clients (id, name, age) VALUES(?,?,?)",
                 new SqlExecutor<Void>() {
                     @Override
@@ -30,47 +30,57 @@ public class SqlStorage implements IStorage {
                     }
                 }
         );
-        Collection<Transaction> transactions = new HashSet<>();
+        /*Collection<Transaction> transactions = new HashSet<>();
         for(final Account acc: c.getAccounts().values()) if(acc != null) {
-            Sql.execute("INSERT INTO accounts (account_id, client_id, amount) VALUES(?,?,?)",
-                    new SqlExecutor<Void>() {
-                        @Override
-                        public Void execute(PreparedStatement st) throws SQLException {
-                            st.setString(1, acc.getAccountId());
-                            st.setString(2, acc.getClientId());
-                            st.setInt(3, acc.getAmount());
-                            st.execute();
-                            return null;
-                        }
-                    }
-            );
+            addAccount(acc);
             for(Transaction tr: acc.getTransactions().values()) {
                 transactions.add(tr);
             }
         }
         for(final Transaction tr: transactions) if (tr != null) {
-            Sql.execute("INSERT INTO transactions VALUES(?,?,?,?,?,?,?,?)",
-                    new SqlExecutor<Void>() {
-                        @Override
-                        public Void execute(PreparedStatement st) throws SQLException {
-                            st.setString(1, tr.getTransactionId());
-                            st.setString(2, tr.getType());
-                            st.setString(3, tr.getDate());
-                            st.setInt(4, tr.getAmount());
-                            st.setString(5, tr.getSenderClientId());
-                            st.setString(6, tr.getSenderAccountId());
-                            st.setString(7, tr.getReceiverClientId());
-                            st.setString(8, tr.getReceiverAccountId());
-                            st.execute();
-                            return null;
-                        }
-                    }
-            );
-        }
+            addTransaction(tr);
+        }*/
     }
 
     @Override
-    public void update(final Client c) {
+    public void addAccount(final Account acc) {
+        Sql.execute("INSERT INTO accounts (account_id, client_id, amount) VALUES(?,?,?)",
+                new SqlExecutor<Void>() {
+                    @Override
+                    public Void execute(PreparedStatement st) throws SQLException {
+                        st.setString(1, acc.getAccountId());
+                        st.setString(2, acc.getClientId());
+                        st.setInt(3, acc.getAmount());
+                        st.execute();
+                        return null;
+                    }
+                }
+        );
+    }
+
+    @Override
+    public void addTransaction(final Transaction tr) {
+        Sql.execute("INSERT INTO transactions VALUES(?,?,?,?,?,?,?,?)",
+                new SqlExecutor<Void>() {
+                    @Override
+                    public Void execute(PreparedStatement st) throws SQLException {
+                        st.setString(1, tr.getTransactionId());
+                        st.setString(2, tr.getType());
+                        st.setString(3, tr.getDate());
+                        st.setInt(4, tr.getAmount());
+                        st.setString(5, tr.getSenderClientId());
+                        st.setString(6, tr.getSenderAccountId());
+                        st.setString(7, tr.getReceiverClientId());
+                        st.setString(8, tr.getReceiverAccountId());
+                        st.execute();
+                        return null;
+                    }
+                }
+        );
+    }
+
+    @Override
+    public void updateClient(final Client c) {
         int cnt = Sql.execute("UPDATE clients SET name=?, age=? WHERE id=?",
                 new SqlExecutor<Integer>() {
                     @Override
@@ -82,12 +92,25 @@ public class SqlStorage implements IStorage {
                     }
                 });
         if (cnt == 0) {
-            throw new BankException("Resume " + c.getClientId() + "not exist", c);
+            throw new BankException("Resume " + c.getClientId() + " not exist", c);
+        }
+        for(final Account acc: c.getAccounts().values()) if(acc != null) {
+            Sql.execute("UPDATE accounts SET amount=? WHERE client_id=? AND account_id=?",
+                    new SqlExecutor<Integer>() {
+                        @Override
+                        public Integer execute(PreparedStatement st) throws SQLException {
+                            st.setInt(1, acc.getAmount());
+                            st.setString(2, c.getClientId());
+                            st.setString(3, acc.getAccountId());
+                            st.executeUpdate();
+                            return null;
+                        }
+                    });
         }
     }
 
     @Override
-    public Client load(final String id) {
+    public Client loadClient(final String id) {
         Client cl = Sql.execute("SELECT c.id, c.name, c.age FROM clients AS c WHERE c.id=?",
             new SqlExecutor<Client>() {
                 @Override
@@ -140,17 +163,32 @@ public class SqlStorage implements IStorage {
     }
 
     @Override
-    public void delete(final String id) {
+    public void deleteClient(final String id) {
         // Strategy
-        int cnt = Sql.execute("DELETE FROM clients WHERE id=?", new SqlExecutor<Integer>() {
+        Sql.execute("DELETE FROM transactions WHERE sender_client_id=? OR receiver_client_id=?", new SqlExecutor<Integer>() {
+            @Override
+            public Integer execute(PreparedStatement ps) throws SQLException {
+                ps.setString(1, id);
+                ps.setString(2, id);
+                return ps.executeUpdate();
+            }
+        });
+        Sql.execute("DELETE FROM accounts WHERE client_id=?", new SqlExecutor<Integer>() {
             @Override
             public Integer execute(PreparedStatement ps) throws SQLException {
                 ps.setString(1, id);
                 return ps.executeUpdate();
             }
         });
-        if (cnt == 0) {
-            throw new BankException("Client " + id + "not exist", id);
+        int cntCl = Sql.execute("DELETE FROM clients WHERE id=?", new SqlExecutor<Integer>() {
+            @Override
+            public Integer execute(PreparedStatement ps) throws SQLException {
+                ps.setString(1, id);
+                return ps.executeUpdate();
+            }
+        });
+        if (cntCl == 0) {
+            throw new BankException("Client " + id + " not exist", id);
         }
     }
 
@@ -172,7 +210,7 @@ public class SqlStorage implements IStorage {
     }
 
     @Override
-    public void clear() {
+    public void clearDataBase() {
         Sql.execute("DELETE FROM transactions", new SqlExecutor<Void>() {
             @Override
             public Void execute(PreparedStatement ps) throws SQLException {
