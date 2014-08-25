@@ -1,6 +1,7 @@
 package sql;
 
 import bank.BankException;
+import sql.database.SqlSettings;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,8 +12,14 @@ import java.sql.SQLException;
  * Date: 06.11.13
  */
 public class DirectConnection implements ConnectionFactory {
+    private String url = null;
+    private String user = null;
+    private String password = null;
 
-    public DirectConnection()  {
+    public DirectConnection(SqlSettings stn)  {
+        this.url = stn.getUrl();
+        this.user = stn.getUser();
+        this.password = stn.getPassword();
         try {
             Class.forName("org.postgresql.Driver").newInstance();
         } catch (Exception e) {
@@ -22,8 +29,6 @@ public class DirectConnection implements ConnectionFactory {
 
     @Override
     public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5432/bankClients",
-                "postgres", "123456");
+        return DriverManager.getConnection(url, user, password);
     }
 }

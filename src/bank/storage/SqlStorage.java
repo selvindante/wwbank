@@ -84,18 +84,21 @@ public class SqlStorage implements IStorage {
         if (cnt == 0) {
             throw new BankException("Resume " + c.getClientId() + " not exist", c);
         }
-        for(final Account acc: c.getAccounts().values()) if(acc != null) {
-            Sql.execute("UPDATE accounts SET amount=? WHERE client_id=? AND account_id=?",
-                    new SqlExecutor<Integer>() {
-                        @Override
-                        public Integer execute(PreparedStatement st) throws SQLException {
-                            st.setInt(1, acc.getAmount());
-                            st.setString(2, c.getClientId());
-                            st.setString(3, acc.getAccountId());
-                            st.executeUpdate();
-                            return null;
-                        }
-                    });
+        if(c.getAccounts() != null) {
+            for (final Account acc : c.getAccounts().values())
+                if (acc != null) {
+                    Sql.execute("UPDATE accounts SET amount=? WHERE client_id=? AND account_id=?",
+                            new SqlExecutor<Integer>() {
+                                @Override
+                                public Integer execute(PreparedStatement st) throws SQLException {
+                                    st.setInt(1, acc.getAmount());
+                                    st.setString(2, c.getClientId());
+                                    st.setString(3, acc.getAccountId());
+                                    st.executeUpdate();
+                                    return null;
+                                }
+                            });
+                }
         }
     }
 
@@ -237,7 +240,7 @@ public class SqlStorage implements IStorage {
                     }
                 });
         cl.setAccounts(accounts);
-        for(Account acc: cl.getAccounts().values()) {
+        for(Account acc: cl.getAccounts().values()) if(acc != null) {
             final String accId = acc.getAccountId();
             Map<String, Transaction> transactions = Sql.execute("SELECT t.transaction_id, t.type, t.date, t.amount, t.sender_client_id, t.sender_account_id, t.receiver_client_id, t.receiver_account_id FROM transactions AS t WHERE t.sender_account_id=? OR t.receiver_account_id=?",
                     new SqlExecutor<Map<String, Transaction>>() {

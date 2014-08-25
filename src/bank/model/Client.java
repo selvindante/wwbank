@@ -12,7 +12,7 @@ public class Client {
     private String name = null;
     private String clientId;
     private int age;
-    private Map<String, Account> accounts =  new HashMap<>();
+    private Map<String, Account> accounts = null;
 
     public Client(String name, int age) {
         this.clientId = UUID.randomUUID().toString();
@@ -40,6 +40,7 @@ public class Client {
     }
 
     public void addAccount(Account account) {
+        if(this.accounts == null) this.accounts = new HashMap<>();
         this.accounts.put(account.getAccountId(), account);
     }
 

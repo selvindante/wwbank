@@ -1,6 +1,7 @@
 package sql;
 
 import bank.BankException;
+import sql.database.Heroku;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -11,7 +12,7 @@ import java.sql.SQLException;
  */
 public class Sql {
     public static ConnectionFactory CONN_FACTORY =
-            new DirectConnection();
+            new DirectConnection(new Heroku());
 
     public static <T> T execute(String sql, SqlExecutor<T> executor) {
         try (Connection conn = Sql.CONN_FACTORY.getConnection();
