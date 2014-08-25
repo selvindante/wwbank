@@ -17,7 +17,7 @@ import java.util.*;
  */
 public class SqlStorage implements IStorage {
     @Override
-    public void saveClient(final Client c) {
+    public void addClient(final Client c) {
         Sql.execute("INSERT INTO clients (id, name, age) VALUES(?,?,?)",
                 new SqlExecutor<Void>() {
                     @Override
@@ -30,16 +30,6 @@ public class SqlStorage implements IStorage {
                     }
                 }
         );
-        /*Collection<Transaction> transactions = new HashSet<>();
-        for(final Account acc: c.getAccounts().values()) if(acc != null) {
-            addAccount(acc);
-            for(Transaction tr: acc.getTransactions().values()) {
-                transactions.add(tr);
-            }
-        }
-        for(final Transaction tr: transactions) if (tr != null) {
-            addTransaction(tr);
-        }*/
     }
 
     @Override
@@ -123,6 +113,115 @@ public class SqlStorage implements IStorage {
                     throw new BankException("Client " + id + " is not found.");
                 }
             });
+        cl.setAccounts(loadAccounts(cl));
+        return cl;
+    }
+
+    @Override
+    public void deleteClient(final String id) {
+        // Strategy
+        Sql.execute("DELETE FROM transactions WHERE sender_client_id=? OR receiver_client_id=?", new SqlExecutor<Integer>() {
+            @Override
+            public Integer execute(PreparedStatement ps) throws SQLException {
+                ps.setString(1, id);
+                ps.setString(2, id);
+                ps.executeUpdate();
+                return null;
+            }
+        });
+        Sql.execute("DELETE FROM accounts WHERE client_id=?", new SqlExecutor<Integer>() {
+            @Override
+            public Integer execute(PreparedStatement ps) throws SQLException {
+                ps.setString(1, id);
+                ps.executeUpdate();
+                return null;
+            }
+        });
+        int cntCl = Sql.execute("DELETE FROM clients WHERE id=?", new SqlExecutor<Integer>() {
+            @Override
+            public Integer execute(PreparedStatement ps) throws SQLException {
+                ps.setString(1, id);
+                ps.executeUpdate();
+                return null;
+            }
+        });
+        if (cntCl == 0) {
+            throw new BankException("Client " + id + " not exist", id);
+        }
+    }
+
+    @Override
+    public void deleteAccount(final String accountId) {
+        Sql.execute("DELETE FROM accounts WHERE account_id=?", new SqlExecutor<Integer>() {
+            @Override
+            public Integer execute(PreparedStatement ps) throws SQLException {
+                ps.setString(1, accountId);
+                ps.executeUpdate();
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public void deleteTransaction(final String transactionId) {
+        Sql.execute("DELETE FROM transactions WHERE transaction_id=?", new SqlExecutor<Integer>() {
+            @Override
+            public Integer execute(PreparedStatement ps) throws SQLException {
+                ps.setString(1, transactionId);
+                ps.executeUpdate();
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public Collection<Client> getAll() {
+        Collection<Client> clients = Sql.execute("SELECT c.id, c.name, c.age  FROM clients AS c order by c.name, c.id",
+                new SqlExecutor<Collection<Client>>() {
+                    @Override
+                    public Collection<Client> execute(PreparedStatement st) throws SQLException {
+                        List<Client> res = new LinkedList<>();
+                        ResultSet rs = st.executeQuery();
+                        while (rs.next()) {
+                            String id = rs.getString("id");
+                            res.add(new Client(rs.getString("name"), id, rs.getInt("age"), null));
+                        }
+                        return res;
+                    }
+                });
+        for(Client cl: clients) {
+            cl.setAccounts(loadAccounts(cl));
+        }
+        return clients;
+    }
+
+    @Override
+    public void clearDataBase() {
+        Sql.execute("DELETE FROM transactions", new SqlExecutor<Void>() {
+            @Override
+            public Void execute(PreparedStatement ps) throws SQLException {
+                ps.execute();
+                return null;
+            }
+        });
+        Sql.execute("DELETE FROM accounts", new SqlExecutor<Void>() {
+            @Override
+            public Void execute(PreparedStatement ps) throws SQLException {
+                ps.execute();
+                return null;
+            }
+        });
+        Sql.execute("DELETE FROM clients", new SqlExecutor<Void>() {
+            @Override
+            public Void execute(PreparedStatement ps) throws SQLException {
+                ps.execute();
+                return null;
+            }
+        });
+    }
+
+    private Map<String, Account> loadAccounts(Client cl) {
+        final String id = cl.getClientId();
         Map<String, Account> accounts = Sql.execute("SELECT a.account_id, a.client_id, a.amount FROM accounts AS a WHERE a.client_id=?",
                 new SqlExecutor<Map<String, Account>>() {
                     @Override
@@ -150,8 +249,8 @@ public class SqlStorage implements IStorage {
                             Map<String, Transaction> res = new HashMap<>();
                             while (rs.next()) {
                                 Transaction tr = new Transaction(rs.getString("transaction_id"), rs.getString("type"), rs.getString("date"), rs.getInt("amount"),
-                                                                 rs.getString("sender_client_id"), rs.getString("sender_account_id"),
-                                                                 rs.getString("receiver_client_id"), rs.getString("receiver_account_id"));
+                                        rs.getString("sender_client_id"), rs.getString("sender_account_id"),
+                                        rs.getString("receiver_client_id"), rs.getString("receiver_account_id"));
                                 res.put(tr.getTransactionId(), tr);
                             }
                             return res;
@@ -159,78 +258,6 @@ public class SqlStorage implements IStorage {
                     });
             acc.setTransactions(transactions);
         }
-        return cl;
-    }
-
-    @Override
-    public void deleteClient(final String id) {
-        // Strategy
-        Sql.execute("DELETE FROM transactions WHERE sender_client_id=? OR receiver_client_id=?", new SqlExecutor<Integer>() {
-            @Override
-            public Integer execute(PreparedStatement ps) throws SQLException {
-                ps.setString(1, id);
-                ps.setString(2, id);
-                return ps.executeUpdate();
-            }
-        });
-        Sql.execute("DELETE FROM accounts WHERE client_id=?", new SqlExecutor<Integer>() {
-            @Override
-            public Integer execute(PreparedStatement ps) throws SQLException {
-                ps.setString(1, id);
-                return ps.executeUpdate();
-            }
-        });
-        int cntCl = Sql.execute("DELETE FROM clients WHERE id=?", new SqlExecutor<Integer>() {
-            @Override
-            public Integer execute(PreparedStatement ps) throws SQLException {
-                ps.setString(1, id);
-                return ps.executeUpdate();
-            }
-        });
-        if (cntCl == 0) {
-            throw new BankException("Client " + id + " not exist", id);
-        }
-    }
-
-    @Override
-    public Collection<Client> getAll() {
-        return Sql.execute("SELECT c.id, c.name, c.age  FROM clients AS c order by c.name, c.id",
-                new SqlExecutor<Collection<Client>>() {
-                    @Override
-                    public Collection<Client> execute(PreparedStatement st) throws SQLException {
-                        List<Client> res = new LinkedList<>();
-                        ResultSet rs = st.executeQuery();
-                        while (rs.next()) {
-                            String id = rs.getString("id");
-                            res.add(new Client(rs.getString("name"), id, rs.getInt("age"), null));
-                        }
-                        return res;
-                    }
-                });
-    }
-
-    @Override
-    public void clearDataBase() {
-        Sql.execute("DELETE FROM transactions", new SqlExecutor<Void>() {
-            @Override
-            public Void execute(PreparedStatement ps) throws SQLException {
-                ps.execute();
-                return null;
-            }
-        });
-        Sql.execute("DELETE FROM accounts", new SqlExecutor<Void>() {
-            @Override
-            public Void execute(PreparedStatement ps) throws SQLException {
-                ps.execute();
-                return null;
-            }
-        });
-        Sql.execute("DELETE FROM clients", new SqlExecutor<Void>() {
-            @Override
-            public Void execute(PreparedStatement ps) throws SQLException {
-                ps.execute();
-                return null;
-            }
-        });
+        return  accounts;
     }
 }

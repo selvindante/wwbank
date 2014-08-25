@@ -12,7 +12,7 @@ import java.util.Collection;
  */
 public interface IStorage {
 
-    void saveClient(Client c);
+    void addClient(Client c);
 
     void addAccount(Account acc);
 
@@ -23,6 +23,10 @@ public interface IStorage {
     Client loadClient(String id);
 
     void deleteClient(String id);
+
+    void deleteAccount(String accountId);
+
+    void deleteTransaction(String transactionId);
 
     Collection<Client> getAll();
 

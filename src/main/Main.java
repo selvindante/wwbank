@@ -20,7 +20,7 @@ public class Main {
         //Client cl2 = new Client("Jack", 29);
         //Client cl3 = new Client("Joe", 41);
         Client cl4 = new Client("Arvin", 37);
-        st.saveClient(cl4);
+        st.addClient(cl4);
         //Client cl5 = new Client("Johny", 25);
 
         //Account ac1 = new Account(cl1, 1000);
