@@ -1,13 +1,14 @@
 package bank.web;
 
+import bank.Config;
+import bank.model.Client;
 import bank.storage.IStorage;
-
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.Writer;
 
 /**
  * Created by Selvin
@@ -21,11 +22,31 @@ public class ClientServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws javax.servlet.ServletException, IOException {
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType("text/html; charset=UTF-8");
-        Writer w = response.getWriter();
-        String name = request.getParameter("name");
-        w.write("Тест сервелет: привет " + name);
-        w.close();
+        String id = request.getParameter("id");
+        String action = request.getParameter("action");
+        Client c = null;
+
+        switch (action) {
+            case "delete":
+                storage.deleteClient(id);
+                response.sendRedirect("list");
+                return;
+            case "create":
+                //TODO create client
+                break;
+            case "view":
+                c = storage.loadClient(id);
+                break;
+            default:
+                throw new IllegalArgumentException("Action " + action + " is illegal");
+        }
+        request.setAttribute("client", c);
+        request.getRequestDispatcher("/view.jsp").forward(request, response);
+    }
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        storage = Config.getStorage();
     }
 }
