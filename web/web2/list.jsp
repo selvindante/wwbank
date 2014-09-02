@@ -10,10 +10,13 @@
 <body>
 <header>List of bank clients</header>
 <section>
+    &nbsp; &nbsp; <button>Add</button> &nbsp; &nbsp; <button>Clear</button>
+    <p>
     <table border="1" cellpadding="8" cellspacing="0">
         <tr>
             <th>Name</th>
             <th>Age</th>
+            <th>Amount</th>
         </tr>
         <% for (Client c : Config.getStorage().getAll()) { %>
         <tr>
@@ -23,6 +26,9 @@
             </td>
             <td>
                 <%=c.getAge()%>
+            </td>
+            <td>
+                <%=c.getAmount()%>
             </td>
         </tr>
         <% } %>

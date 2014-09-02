@@ -12,6 +12,7 @@ public class Client {
     private String name = null;
     private String clientId;
     private int age;
+    private int amount = 0;
     private Map<String, Account> accounts = null;
 
     public Client(String name, int age) {
@@ -25,6 +26,11 @@ public class Client {
         this.clientId = clientId;
         this.age = age;
         this.accounts = accounts;
+        if(accounts != null) {
+            for(Account acc: accounts.values()) if(acc != null) {
+                this.amount += acc.getAmount();
+            }
+        }
     }
 
     public String getClientId() {
@@ -37,6 +43,14 @@ public class Client {
 
     public int getAge() {
         return age;
+    }
+
+    public int getAmount() {
+        return  amount;
+    }
+
+    public Account getAccount(String id) {
+        return accounts.get(id);
     }
 
     public void addAccount(Account account) {

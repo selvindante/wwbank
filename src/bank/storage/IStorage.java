@@ -22,6 +22,8 @@ public interface IStorage {
 
     Client loadClient(String id);
 
+    Account loadAccount(String id);
+
     void deleteClient(String id);
 
     void deleteAccount(String accountId);

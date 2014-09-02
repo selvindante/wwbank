@@ -28,4 +28,14 @@
         <url-pattern>/client</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>accountServlet</servlet-name>
+        <servlet-class>bank.web.AccountServlet</servlet-class>
+        <load-on-startup>0</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>accountServlet</servlet-name>
+        <url-pattern>/account</url-pattern>
+    </servlet-mapping>
+
 </web-app>

@@ -121,6 +121,24 @@ public class SqlStorage implements IStorage {
     }
 
     @Override
+    public Account loadAccount(final String id) {
+        Account a = Sql.execute("SELECT a.client_id, a.amount FROM accounts AS a WHERE a.account_id=?",
+                new SqlExecutor<Account>() {
+                    @Override
+                    public Account execute(PreparedStatement st) throws SQLException {
+                        st.setString(1, id);
+                        ResultSet rs = st.executeQuery();
+                        if (rs.next()) {
+                            return new Account(id, rs.getString("client_id"),  rs.getInt("amount"));
+                        }
+                        throw new BankException("Account " + id + " is not found.");
+                    }
+                });
+        a.setTransactions(loadTransactions(a));
+        return a;
+    }
+
+    @Override
     public void deleteClient(final String id) {
         // Strategy
         Sql.execute("DELETE FROM transactions WHERE sender_client_id=? OR receiver_client_id=?", new SqlExecutor<Integer>() {
@@ -241,26 +259,30 @@ public class SqlStorage implements IStorage {
                 });
         cl.setAccounts(accounts);
         for(Account acc: cl.getAccounts().values()) if(acc != null) {
-            final String accId = acc.getAccountId();
-            Map<String, Transaction> transactions = Sql.execute("SELECT t.transaction_id, t.type, t.date, t.amount, t.sender_client_id, t.sender_account_id, t.receiver_client_id, t.receiver_account_id FROM transactions AS t WHERE t.sender_account_id=? OR t.receiver_account_id=?",
-                    new SqlExecutor<Map<String, Transaction>>() {
-                        @Override
-                        public Map<String, Transaction> execute(PreparedStatement st) throws SQLException {
-                            st.setString(1, accId);
-                            st.setString(2, accId);
-                            ResultSet rs = st.executeQuery();
-                            Map<String, Transaction> res = new HashMap<>();
-                            while (rs.next()) {
-                                Transaction tr = new Transaction(rs.getString("transaction_id"), rs.getString("type"), rs.getString("date"), rs.getInt("amount"),
-                                        rs.getString("sender_client_id"), rs.getString("sender_account_id"),
-                                        rs.getString("receiver_client_id"), rs.getString("receiver_account_id"));
-                                res.put(tr.getTransactionId(), tr);
-                            }
-                            return res;
-                        }
-                    });
-            acc.setTransactions(transactions);
+            acc.setTransactions(loadTransactions(acc));
         }
         return  accounts;
+    }
+
+    private Map<String, Transaction> loadTransactions(Account acc) {
+        final String accId = acc.getAccountId();
+        Map<String, Transaction> transactions = Sql.execute("SELECT t.transaction_id, t.type, t.date, t.amount, t.sender_client_id, t.sender_account_id, t.receiver_client_id, t.receiver_account_id FROM transactions AS t WHERE t.sender_account_id=? OR t.receiver_account_id=?",
+                new SqlExecutor<Map<String, Transaction>>() {
+                    @Override
+                    public Map<String, Transaction> execute(PreparedStatement st) throws SQLException {
+                        st.setString(1, accId);
+                        st.setString(2, accId);
+                        ResultSet rs = st.executeQuery();
+                        Map<String, Transaction> res = new HashMap<>();
+                        while (rs.next()) {
+                            Transaction tr = new Transaction(rs.getString("transaction_id"), rs.getString("type"), rs.getString("date"), rs.getInt("amount"),
+                                    rs.getString("sender_client_id"), rs.getString("sender_account_id"),
+                                    rs.getString("receiver_client_id"), rs.getString("receiver_account_id"));
+                            res.put(tr.getTransactionId(), tr);
+                        }
+                        return res;
+                    }
+                });
+        return transactions;
     }
 }

@@ -1,7 +1,7 @@
 package bank.web;
 
 import bank.Config;
-import bank.model.Client;
+import bank.model.Account;
 import bank.storage.IStorage;
 
 import javax.servlet.ServletConfig;
@@ -13,9 +13,9 @@ import java.io.IOException;
 
 /**
  * Created by Selvin
- * on 26.08.2014.
+ * on 02.09.2014.
  */
-public class ClientServlet extends HttpServlet {
+public class AccountServlet extends HttpServlet {
     private IStorage storage;
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -25,7 +25,7 @@ public class ClientServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws javax.servlet.ServletException, IOException {
         String id = request.getParameter("id");
         String action = request.getParameter("action");
-        Client c = null;
+        Account ac = null;
 
         switch (action) {
             case "delete":
@@ -36,13 +36,13 @@ public class ClientServlet extends HttpServlet {
                 //TODO create client
                 break;
             case "view":
-                c = storage.loadClient(id);
+                ac = storage.loadAccount(id);
                 break;
             default:
                 throw new IllegalArgumentException("Action " + action + " is illegal");
         }
-        request.setAttribute("client", c);
-        request.getRequestDispatcher("/clientView.jsp").forward(request, response);
+        request.setAttribute("account", ac);
+        request.getRequestDispatcher("/accountView.jsp").forward(request, response);
     }
 
     @Override
