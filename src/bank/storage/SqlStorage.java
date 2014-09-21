@@ -162,8 +162,7 @@ public class SqlStorage implements IStorage {
             @Override
             public Integer execute(PreparedStatement ps) throws SQLException {
                 ps.setString(1, id);
-                ps.executeUpdate();
-                return null;
+                return ps.executeUpdate();
             }
         });
         if (cntCl == 0) {

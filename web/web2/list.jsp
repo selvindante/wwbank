@@ -10,7 +10,7 @@
 <body>
 <header>List of bank clients</header>
 <section>
-    &nbsp; &nbsp; <button>Add</button> &nbsp; &nbsp; <button>Clear</button>
+    &nbsp; &nbsp; <button onclick="document.location.href='clientAdd.jsp'">Add</button> &nbsp; &nbsp; <button>Clear</button>
     <p>
     <table border="1" cellpadding="8" cellspacing="0">
         <tr>

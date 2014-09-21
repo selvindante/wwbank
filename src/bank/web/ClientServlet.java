@@ -19,10 +19,13 @@ public class ClientServlet extends HttpServlet {
     private IStorage storage;
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        request.setCharacterEncoding("UTF-8");
+        Client cl = new Client(request.getParameter("name"), Integer.parseInt(request.getParameter("age")));
+        storage.addClient(cl);
+        response.sendRedirect("client?id=" + cl.getClientId() + "&action=view");
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws javax.servlet.ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String id = request.getParameter("id");
         String action = request.getParameter("action");
         Client c = null;

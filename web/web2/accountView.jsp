@@ -34,7 +34,7 @@
             border-spacing: 0;
         }
     </STYLE>
-    <title>Client: <%=account.getAccountId()%>
+    <title>Account: <%=account.getAccountId()%>
     </title>
 </head>
 <body>

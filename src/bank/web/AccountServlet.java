@@ -22,14 +22,14 @@ public class AccountServlet extends HttpServlet {
 
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws javax.servlet.ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String id = request.getParameter("id");
         String action = request.getParameter("action");
         Account ac = null;
 
         switch (action) {
             case "delete":
-                storage.deleteClient(id);
+                storage.deleteAccount(id);
                 response.sendRedirect("list");
                 return;
             case "create":

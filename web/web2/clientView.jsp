@@ -32,7 +32,11 @@
     </title>
 </head>
 <body>
-<header>Personal page of client: <%=client.getName()%> &nbsp; &nbsp; <button>Edit</button> &nbsp; &nbsp; <button>Delete</button></header>
+<header>
+    Personal page of client: <%=client.getName()%>
+    &nbsp; &nbsp; <button>Edit</button>
+    &nbsp; &nbsp; <button onclick="document.location.href='client?id=<%=client.getClientId()%>&action=delete'">Delete</button>
+</header>
 <section>
     <p>
     Name: ${client.getName()}
@@ -71,7 +75,7 @@
         This client does not have accounts. You can <button>Add</button> account.
         <p>
     <% } %>
-    <button onclick="window.history.back()">ОК</button>
+    <button onclick="document.location.href='list.jsp'">ОК</button>
 </section>
 </body>
 </html>
