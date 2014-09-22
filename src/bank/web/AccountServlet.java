@@ -33,7 +33,8 @@ public class AccountServlet extends HttpServlet {
                 response.sendRedirect("list");
                 return;
             case "create":
-                //TODO create client
+                ac = new Account(id);
+                storage.addAccount(ac);
                 break;
             case "view":
                 ac = storage.loadAccount(id);

@@ -20,7 +20,19 @@ public class ClientServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
-        Client cl = new Client(request.getParameter("name"), Integer.parseInt(request.getParameter("age")));
+        String age = request.getParameter("age");
+        if(age.length() == 0) {
+            response.sendRedirect("list");
+            return;
+        }
+        for(Character c: age.toCharArray()) {
+            if(!Character.isDigit(c)) {
+                //TODO Paste error window with description
+                response.sendRedirect("list");
+                return;
+            }
+        }
+        Client cl = new Client(request.getParameter("name"), Integer.parseInt(age));
         storage.addClient(cl);
         response.sendRedirect("client?id=" + cl.getClientId() + "&action=view");
     }
@@ -35,9 +47,6 @@ public class ClientServlet extends HttpServlet {
                 storage.deleteClient(id);
                 response.sendRedirect("list");
                 return;
-            case "create":
-                //TODO create client
-                break;
             case "view":
                 c = storage.loadClient(id);
                 break;

@@ -45,16 +45,16 @@
     <p>
     Amount: ${client.getAmount()}
     <p>
-    ID: ${client.getClientId()}
+    Client ID: ${client.getClientId()}
     <p>
     <%if(!client.getAccounts().isEmpty()) {%>
         List of client accounts:
         <p>
-        &nbsp; &nbsp; <button>Add</button> &nbsp; &nbsp; <button>Clear</button>
+        &nbsp; &nbsp; <button onclick="document.location.href='account?id=<%=client.getClientId()%>&action=create'">Add</button> &nbsp; &nbsp; <button>Clear</button>
         <p>
         <table border="1" cellpadding="8" cellspacing="0">
             <tr>
-                <th>ID</th>
+                <th>Account ID</th>
                 <th>Amount</th>
             </tr>
             <% for (Account acc : client.getAccounts().values()) if(acc != null) { %>

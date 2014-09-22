@@ -23,6 +23,12 @@ public class Account {
         client.addAccount(this);
     }
 
+    public Account(String clientId) {
+        this.accountId = UUID.randomUUID().toString();
+        this.clientId = clientId;
+        this.amount = 0;
+    }
+
     public Account(Client client, int amount) {
         this(client);
         this.amount = amount;

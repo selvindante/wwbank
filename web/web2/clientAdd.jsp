@@ -42,8 +42,7 @@
             <dd><input type="text" name="age" size=50 value=""></dd>
         </dl>
         <button type="submit"><%-- onclick="return validate()--%>Save</button>
-        <button onclick="window.history.back()">Cancel</button>
     </form>
-
+    <button onclick="window.history.back()">Cancel</button>
 </body>
 </html>
