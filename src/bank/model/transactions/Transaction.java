@@ -69,6 +69,19 @@ public class Transaction {
         }
     }
 
+    public Transaction(String type, int amount, String senderClientId, String senderAccountId, String receiverClientId, String receiverAccountId) {
+        this.transactionId = UUID.randomUUID().toString();
+        this.type = type;
+        Date now = new Date();
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH.mm.ss");
+        this.date = df.format(now);
+        this.amount = amount;
+        this.senderClientId = senderClientId;
+        this.senderAccountId = senderAccountId;
+        this.receiverClientId = receiverClientId;
+        this.receiverAccountId = receiverAccountId;
+    }
+
     public Transaction(String transactionId, String type, String date, int amount, String senderClientId, String senderAccountId, String receiverClientId, String receiverAccountId) {
         this.transactionId = transactionId;
         this.type = type;

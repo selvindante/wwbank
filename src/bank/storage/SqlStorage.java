@@ -87,19 +87,23 @@ public class SqlStorage implements IStorage {
         if(c.getAccounts() != null) {
             for (final Account acc : c.getAccounts().values())
                 if (acc != null) {
-                    Sql.execute("UPDATE accounts SET amount=? WHERE client_id=? AND account_id=?",
-                            new SqlExecutor<Integer>() {
-                                @Override
-                                public Integer execute(PreparedStatement st) throws SQLException {
-                                    st.setInt(1, acc.getAmount());
-                                    st.setString(2, c.getClientId());
-                                    st.setString(3, acc.getAccountId());
-                                    st.executeUpdate();
-                                    return null;
-                                }
-                            });
+                    updateAccount(acc);
                 }
         }
+    }
+
+    @Override
+    public void updateAccount(final Account acc) {
+        Sql.execute("UPDATE accounts SET amount=? WHERE account_id=?",
+                new SqlExecutor<Integer>() {
+                    @Override
+                    public Integer execute(PreparedStatement st) throws SQLException {
+                        st.setInt(1, acc.getAmount());
+                        st.setString(1, acc.getAccountId());
+                        st.executeUpdate();
+                        return null;
+                    }
+                });
     }
 
     @Override
@@ -238,6 +242,23 @@ public class SqlStorage implements IStorage {
                 return null;
             }
         });
+    }
+
+    @Override
+    public String getClientId(final String accountId) {
+        String id = Sql.execute("SELECT a.client_id FROM accounts AS a WHERE a.account_id=?",
+                new SqlExecutor<String>() {
+                    @Override
+                    public String execute(PreparedStatement st) throws SQLException {
+                        st.setString(1, accountId);
+                        ResultSet rs = st.executeQuery();
+                        if (rs.next()) {
+                            return rs.getString("client_id");
+                        }
+                        throw new BankException("Account ID " + accountId + " is not found.");
+                    }
+                });
+        return id;
     }
 
     private Map<String, Account> loadAccounts(Client cl) {

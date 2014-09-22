@@ -72,7 +72,7 @@
         <p>
     <% }
     else {%>
-        This client does not have accounts. You can <button>Add</button> account.
+        This client does not have accounts. You can <button onclick="document.location.href='account?id=<%=client.getClientId()%>&action=create'">Add</button> account.
         <p>
     <% } %>
     <button onclick="document.location.href='list.jsp'">ОК</button>

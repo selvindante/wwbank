@@ -20,6 +20,8 @@ public interface IStorage {
 
     void updateClient(Client c);
 
+    void updateAccount(Account acc);
+
     Client loadClient(String id);
 
     Account loadAccount(String id);
@@ -33,4 +35,6 @@ public interface IStorage {
     Collection<Client> getAll();
 
     void clearDataBase();
+
+    String getClientId(String accountId);
 }

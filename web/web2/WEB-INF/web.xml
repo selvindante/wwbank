@@ -38,4 +38,14 @@
         <url-pattern>/account</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>transactionServlet</servlet-name>
+        <servlet-class>bank.web.TransactionServlet</servlet-class>
+        <load-on-startup>0</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>transactionServlet</servlet-name>
+        <url-pattern>/transaction</url-pattern>
+    </servlet-mapping>
+
 </web-app>

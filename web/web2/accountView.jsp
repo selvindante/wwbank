@@ -38,7 +38,7 @@
     </title>
 </head>
 <body>
-<header>Account: <%=account.getAccountId()%> &nbsp; <button>Edit</button> &nbsp; <button>Delete</button></header>
+<header>Account: <%=account.getAccountId()%> &nbsp; <button>Delete</button></header>
 <section>
     <p>
         Client ID: ${account.getClientId()}
@@ -50,7 +50,7 @@
     <%if(!account.getTransactions().isEmpty()) {%>
     List of transactions:
     <p>
-        &nbsp; &nbsp; <button>Add</button> &nbsp; &nbsp; <button>Clear</button>
+        &nbsp; &nbsp; <button onclick="document.location.href='transactionAdd.jsp'">Add</button> &nbsp; &nbsp; <button>Clear</button>
     <p>
     <table border="1" cellpadding="8" cellspacing="0">
         <tr>
@@ -95,7 +95,7 @@
     <p>
             <% }
         else {%>
-        This account does not have transactions. You can <button>Add</button> account.
+        This account does not have transactions. You can <button onclick="document.location.href='transactionAdd.jsp'">Add</button> transaction.
     <p>
             <% } %>
         <button onclick="window.history.back()">ОК</button>
