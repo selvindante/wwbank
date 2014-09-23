@@ -69,7 +69,7 @@ public class Transaction {
         }
     }
 
-    public Transaction(String type, int amount, String senderClientId, String senderAccountId, String receiverClientId, String receiverAccountId) {
+    /*public Transaction(String type, int amount, String senderClientId, String senderAccountId, String receiverClientId, String receiverAccountId) {
         this.transactionId = UUID.randomUUID().toString();
         this.type = type;
         Date now = new Date();
@@ -81,7 +81,7 @@ public class Transaction {
         this.receiverClientId = receiverClientId;
         this.receiverAccountId = receiverAccountId;
     }
-
+*/
     public Transaction(String transactionId, String type, String date, int amount, String senderClientId, String senderAccountId, String receiverClientId, String receiverAccountId) {
         this.transactionId = transactionId;
         this.type = type;

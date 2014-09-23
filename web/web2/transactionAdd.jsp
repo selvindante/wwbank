@@ -35,14 +35,17 @@
     <title>Creating of new transaction</title>
 </head>
 <body>
-    <header>Creating of new client</header>
+    <header>Creating of new transaction</header>
     <%-- TODO Link with TransactionServlet, fix checkbox... --%>
     <form id="transaction" method="post" action="transaction" enctype="application/x-www-form-urlencoded">
         <dl>
             <dt>Type:</dt>
-            <%for(TransactionType tt: TransactionType.values()) {%>
-                <td><%=tt.toString()%> <input type="radio" name="<%=tt.toString().toLowerCase()%>" value="<%=tt.toString()%>"></td>
-            <%}%>
+            <%--for(TransactionType tt: TransactionType.values()) {%>
+                <p><input type="radio" name="type" value="<%=tt.toString()%>"> <%=tt.toString()%></p>
+            <%}--%>
+            <p><input type="radio" name="type" value="Deposit"> Deposit </p>
+            <p><input type="radio" name="type" value="Withdrawal"> Withdrawal </p>
+            <p><input type="radio" name="type" value="Transfer"> Transfer </p>
         </dl>
         <dl>
             <dt>Amount:</dt>
@@ -50,7 +53,7 @@
         </dl>
         <dl>
             <dt>Sender account ID:</dt>
-            <dd><input type="text" name="currentAccountId" size=50 value=""></dd>
+            <dd><input type="text" name="senderAccountId" size=50 value=""></dd>
         </dl>
         <dl>
             <dt>Receiver Account ID:</dt>

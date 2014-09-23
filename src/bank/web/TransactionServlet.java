@@ -4,6 +4,7 @@ import bank.BankException;
 import bank.Config;
 import bank.model.Account;
 import bank.model.transactions.Transaction;
+import bank.model.transactions.TransactionType;
 import bank.storage.IStorage;
 
 import javax.servlet.ServletConfig;
@@ -24,31 +25,34 @@ public class TransactionServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String type = request.getParameter("type");
         int amount = Integer.parseInt(request.getParameter("amount"));
-        String currentAccountId = request.getParameter("currentAccountId");
-        String currentClientId = storage.getClientId(currentAccountId);
-        String receiverAccountId = request.getParameter("receiverAccountId");
-        String receiverClientId = storage.getClientId(receiverAccountId);
-        storage.addTransaction(new Transaction(type, amount, currentClientId, currentAccountId, receiverClientId, receiverAccountId));
-        Account cAcc = storage.loadAccount(currentAccountId);
-        Account rAcc = storage.loadAccount(receiverAccountId);
-        switch ("type") {
-            case"deposit":
-                cAcc.setAmount(cAcc.getAmount() + amount);
-                storage.updateAccount(cAcc);
-                break;
-            case"withdrawal":
-                cAcc.setAmount(cAcc.getAmount() - amount);
-                storage.updateAccount(cAcc);
-                break;
-            case"transfer":
-                rAcc.setAmount(rAcc.getAmount() + amount);
+
+        switch (type) {
+            case"Deposit":
+                String receiverAccountId = request.getParameter("receiverAccountId");
+                Account rAcc = storage.loadAccount(receiverAccountId);
+                storage.addTransaction(new Transaction(TransactionType.DEPOSIT, rAcc, amount));
                 storage.updateAccount(rAcc);
-                cAcc.setAmount(cAcc.getAmount() - amount);
-                storage.updateAccount(cAcc);
+                response.sendRedirect("account?id=" + receiverAccountId + "&action=view");
+                break;
+            case"Withdrawal":
+                String senderAccountId = request.getParameter("senderAccountId");
+                Account sAcc = storage.loadAccount(senderAccountId);
+                storage.addTransaction(new Transaction(TransactionType.WITHDRAWAL, sAcc, amount));
+                storage.updateAccount(sAcc);
+                response.sendRedirect("account?id=" + senderAccountId + "&action=view");
+                break;
+            case"Transfer":
+                String senderAccountId1 = request.getParameter("senderAccountId");
+                String receiverAccountId1 = request.getParameter("receiverAccountId");
+                Account rAcc1 = storage.loadAccount(receiverAccountId1);
+                Account sAcc1 = storage.loadAccount(senderAccountId1);
+                storage.addTransaction(new Transaction(TransactionType.TRANSFER, sAcc1, rAcc1, amount));
+                storage.updateAccount(rAcc1);
+                storage.updateAccount(sAcc1);
+                response.sendRedirect("account?id=" + senderAccountId1 + "&action=view");
                 break;
             default: throw new BankException("Unknown transaction type!");
         }
-        response.sendRedirect("account?id=" + currentAccountId + "&action=view");
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

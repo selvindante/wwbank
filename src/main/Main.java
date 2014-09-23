@@ -1,5 +1,9 @@
 package main;
 
+import bank.model.Account;
+import bank.storage.IStorage;
+import bank.storage.SqlStorage;
+
 /**
  * Created by Selvin
  * on 21.08.2014.
@@ -37,5 +41,7 @@ public class Main {
         Transaction tr3 = new Transaction(TransactionType.TRANSFER, ac3, ac4, 100);
         st.addTransaction(tr3);
         st.updateClient(cl4);*/
+        IStorage st = new SqlStorage();
+        st.updateAccount(new Account("b7842fd8-11c3-44d7-bd19-fc9ee31528a6", "0589e416-a34c-4156-b1ae-c0277fd3de7d", 450));
     }
 }

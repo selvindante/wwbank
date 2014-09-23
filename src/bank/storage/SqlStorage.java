@@ -99,7 +99,7 @@ public class SqlStorage implements IStorage {
                     @Override
                     public Integer execute(PreparedStatement st) throws SQLException {
                         st.setInt(1, acc.getAmount());
-                        st.setString(1, acc.getAccountId());
+                        st.setString(2, acc.getAccountId());
                         st.executeUpdate();
                         return null;
                     }

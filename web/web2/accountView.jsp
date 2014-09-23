@@ -98,7 +98,7 @@
         This account does not have transactions. You can <button onclick="document.location.href='transactionAdd.jsp'">Add</button> transaction.
     <p>
             <% } %>
-        <button onclick="window.history.back()">ОК</button>
+        <button onclick="document.location.href='client?id=<%=account.getClientId()%>&action=view'">ОК</button>
 </section>
 </body>
 </html>
