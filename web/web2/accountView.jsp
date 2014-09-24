@@ -38,7 +38,7 @@
     </title>
 </head>
 <body>
-<header>Account: <%=account.getAccountId()%> &nbsp; <button>Delete</button></header>
+<header>Account: <%=account.getAccountId()%> &nbsp; <button onclick="document.location.href='account?id=<%=account.getAccountId()%>&action=delete'">Delete</button></header>
 <section>
     <p>
         Client ID: ${account.getClientId()}

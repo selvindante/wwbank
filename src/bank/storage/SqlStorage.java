@@ -176,26 +176,39 @@ public class SqlStorage implements IStorage {
 
     @Override
     public void deleteAccount(final String accountId) {
-        Sql.execute("DELETE FROM accounts WHERE account_id=?", new SqlExecutor<Integer>() {
+        Sql.execute("DELETE FROM transactions WHERE sender_account_id=? OR receiver_account_id=?", new SqlExecutor<Integer>() {
             @Override
             public Integer execute(PreparedStatement ps) throws SQLException {
                 ps.setString(1, accountId);
+                ps.setString(2, accountId);
                 ps.executeUpdate();
                 return null;
             }
         });
+        int cntAc = Sql.execute("DELETE FROM accounts WHERE account_id=?", new SqlExecutor<Integer>() {
+            @Override
+            public Integer execute(PreparedStatement ps) throws SQLException {
+                ps.setString(1, accountId);
+                return ps.executeUpdate();
+            }
+        });
+        if (cntAc == 0) {
+            throw new BankException("Transaction " + accountId + " not exist", accountId);
+        }
     }
 
     @Override
     public void deleteTransaction(final String transactionId) {
-        Sql.execute("DELETE FROM transactions WHERE transaction_id=?", new SqlExecutor<Integer>() {
+        int cntTr = Sql.execute("DELETE FROM transactions WHERE transaction_id=?", new SqlExecutor<Integer>() {
             @Override
             public Integer execute(PreparedStatement ps) throws SQLException {
                 ps.setString(1, transactionId);
-                ps.executeUpdate();
-                return null;
+                return ps.executeUpdate();
             }
         });
+        if (cntTr == 0) {
+            throw new BankException("Transaction " + transactionId + " not exist", transactionId);
+        }
     }
 
     @Override
