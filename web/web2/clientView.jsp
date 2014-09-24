@@ -43,6 +43,7 @@
     <p>
     Age: ${client.getAge()}
     <p>
+    <%--TODO Fix total amount display--%>
     Amount: ${client.getAmount()}
     <p>
     Client ID: ${client.getClientId()}
@@ -50,7 +51,8 @@
     <%if(!client.getAccounts().isEmpty()) {%>
         List of client accounts:
         <p>
-        &nbsp; &nbsp; <button onclick="document.location.href='account?id=<%=client.getClientId()%>&action=create'">Add</button> &nbsp; &nbsp; <button>Clear</button>
+        &nbsp; &nbsp; <button onclick="document.location.href='account?id=<%=client.getClientId()%>&action=create'">Add</button>
+        &nbsp; &nbsp; <button>Clear</button>
         <p>
         <table border="1" cellpadding="8" cellspacing="0">
             <tr>

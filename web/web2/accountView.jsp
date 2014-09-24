@@ -50,7 +50,8 @@
     <%if(!account.getTransactions().isEmpty()) {%>
     List of transactions:
     <p>
-        &nbsp; &nbsp; <button onclick="document.location.href='transactionAdd.jsp'">Add</button> &nbsp; &nbsp; <button>Clear</button>
+        &nbsp; &nbsp; <button onclick="document.location.href='transactionChoose.jsp'">Add</button>
+        &nbsp; &nbsp; <button>Clear</button>
     <p>
     <table border="1" cellpadding="8" cellspacing="0">
         <tr>
@@ -95,7 +96,7 @@
     <p>
             <% }
         else {%>
-        This account does not have transactions. You can <button onclick="document.location.href='transactionAdd.jsp'">Add</button> transaction.
+        This account does not have transactions. You can <button onclick="document.location.href='transactionChoose.jsp'">Add</button> transaction.
     <p>
             <% } %>
         <button onclick="document.location.href='client?id=<%=account.getClientId()%>&action=view'">ОК</button>

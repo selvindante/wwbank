@@ -56,8 +56,20 @@ public class TransactionServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
-
+        String accountId = request.getParameter("accountId");
+        String type = request.getParameter("type");
+        switch (type) {
+            case "Deposit":
+                response.sendRedirect("deposit.jsp");
+                break;
+            case"Withdrawal":
+                response.sendRedirect("withdrawal.jsp");
+                break;
+            case"Transfer":
+                response.sendRedirect("transfer.jsp");
+                break;
+            default: throw new BankException("Unknown transaction type!");
+        }
     }
 
     @Override
